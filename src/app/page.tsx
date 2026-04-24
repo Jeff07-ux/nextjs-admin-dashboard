@@ -607,6 +607,7 @@ export default function Dashboard() {
         </Flex>
 
         <Box display={activeTab === 'dashboard' ? 'block' : 'none'}>
+          <h1>VERSION TEST 123</h1>
           {/* Upload */}
           <Box {...getRootProps()} bg={cardBg} p="8" borderRadius="xl"
             boxShadow="0px 3.5px 5.5px rgba(0,0,0,0.05)"
