@@ -348,6 +348,13 @@ export default function Dashboard() {
   const isDark = colorMode === 'dark'
   const toast = useToast()
 
+  // ─── Phase name mapping ──────────────────────────────────────────────────────
+  const phaseNames: Record<string, string> = {
+    '1': '1er bout',
+    '2': 'Cheminement',
+    '3': '2ème bout'
+  }
+
   // ─── Theme Branding ────────────────────────────────────────────────────────
   const brandConfigs = {
     teal: { light: '#4FD1C5', dark: '#81E6D9', grad: 'linear(to-r, #81E6D9, #63B3ED)' },
@@ -510,7 +517,7 @@ export default function Dashboard() {
       <Box w="250px" bg={sidebarBg} boxShadow="sm" p="5" display="flex" flexDirection="column"
         borderRight="1px solid" borderColor={borderColor}>
         <VStack align="start" spacing="8" h="max-content">
-          <Heading size="sm" color={textColor} pt="4" pl="2" fontWeight={800}>PURITY UI DASHBOARD</Heading>
+          <Heading size="sm" color={textColor} pt="4" pl="2" fontWeight={800}>Performance +</Heading>
           <VStack align="start" w="full" spacing="2">
             <Flex align="center" p="2.5" pl="3" w="full"
               bg={activeTab === 'dashboard' ? (isDark ? 'whiteAlpha.100' : 'white') : 'transparent'}
@@ -679,7 +686,6 @@ export default function Dashboard() {
                   <DownloadableCard
                     filename={`phase_performance_${cable.replace(/\s+/g, '_')}`}
                     tableData={filteredPhase.filter(d => d['Cable name'] === cable)}
-                    tableColumns={['Cable name', 'phase', 'TS', 'TO', 'Performance (%)']}
                     key={idx} bg={cardBg} p="5" borderRadius="xl" boxShadow="0px 3.5px 5.5px rgba(0,0,0,0.07)">
                     <SectionHeader icon={FiBarChart2} title="Phase Performance" isDark={isDark}
                       sub={<><Text as="span" color="teal.300" fontWeight="bold">{cable}</Text></>} />
@@ -694,7 +700,7 @@ export default function Dashboard() {
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridStroke} />
-                          <XAxis dataKey="phase" axisLine={false} tickLine={false} tick={{ fill: tickFill, fontSize: 11 }} />
+                          <XAxis dataKey="phase" axisLine={false} tickLine={false} tick={{ fill: tickFill, fontSize: 11 }} tickFormatter={(value) => phaseNames[value] || value} />
                           <YAxis axisLine={false} tickLine={false} tick={{ fill: tickFill, fontSize: 11 }} />
                           <Tooltip cursor={{ fill: 'rgba(79,209,197,0.08)' }} contentStyle={tooltipStyle} />
                             <Bar dataKey="Performance (%)" fill={`url(#bg${idx})`} radius={[5, 5, 0, 0]} barSize={30} label={{ position: 'top', fontSize: 10, fill: isDark ? '#fff' : '#2D3748', formatter: (value: any) => typeof value === 'number' ? Math.round(value) : value }} />
@@ -724,9 +730,9 @@ export default function Dashboard() {
                   <Table variant="simple" size="sm">
                     <Thead bg={tableHeadBg}>
                       <Tr>
-                        {['Cable', 'Phase', 'TS (Avg)', 'TO', 'Performance'].map(h => (
+                        {['Cable name', 'phase', 'Temps passé (h)', 'Temps Takt (h)', 'Performance (%)'].map(h => (
                           <Th key={h} color={subColor} fontSize="xs" borderColor={borderColor}
-                            isNumeric={['TS (Avg)', 'TO', 'Performance'].includes(h)}>{h}</Th>
+                            isNumeric={['Temps passé (h)', 'Temps Takt (h)', 'Performance (%)'].includes(h)}>{h}</Th>
                         ))}
                       </Tr>
                     </Thead>
@@ -748,11 +754,13 @@ export default function Dashboard() {
                                 {row['Cable name']}
                               </Td>
                             )}
-                            <Td color={subColor} fontSize="xs" borderColor={borderColor}>{row['phase']}</Td>
+                            <Td color={subColor} fontSize="xs" borderColor={borderColor}>{phaseNames[row['phase']] || row['phase']}</Td>
                             <Td isNumeric color={subColor} fontSize="xs" borderColor={borderColor}>
-                              {typeof row['TS'] === 'number' ? row['TS'].toFixed(2) : row['TS']}
+                              {typeof row['Temps passé'] === 'number' ? row['Temps passé'].toFixed(2) : row['Temps passé']}
                             </Td>
-                            <Td isNumeric color={subColor} fontSize="xs" borderColor={borderColor}>{row['TO']}</Td>
+                            <Td isNumeric color={subColor} fontSize="xs" borderColor={borderColor}>
+                              {typeof row['Temps Takt'] === 'number' ? row['Temps Takt'].toFixed(2) : row['Temps Takt']}
+                            </Td>
                             <Td isNumeric borderColor={borderColor}>
                               {typeof row['Performance (%)'] === 'number'
                                 ? <PerfBadge value={row['Performance (%)']} />
