@@ -19,8 +19,7 @@ import html2canvas from 'html2canvas'
 import axios from 'axios'
 import { usePreferences } from './preferences'
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Legend
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts'
 
 // ─── Capture chart as a canvas (hiding download controls) ────────────────────
@@ -306,9 +305,6 @@ function SectionHeader({ icon, title, sub, isDark }: { icon: any, title: string,
 
 
 
-// Pastel color palette for multi-line chart
-const CABLE_COLORS = ['#4FD1C5', '#ED64A6', '#F6AD55', '#63B3ED', '#68D391', '#FC8181', '#B794F4']
-
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function Dashboard() {
   const { preferences, updatePreference, clearData } = usePreferences()
@@ -402,7 +398,7 @@ export default function Dashboard() {
 
     // Detect backend URL
     const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1')
-    const backendUrl = isProduction ? `${window.location.origin}/.netlify/functions/upload` : `http://${window.location.hostname}:8000/api/upload`
+    const backendUrl = isProduction ? `https://dashboard-backend-livid.vercel.app/api/upload` : `http://${window.location.hostname}:8000/api/upload`
 
     try {
       const res = await axios.post(backendUrl, formData, {
@@ -441,10 +437,6 @@ export default function Dashboard() {
   // ─── Derived data ─────────────────────────────────────────────────────────
   const allCables = useMemo(
     () => data ? Array.from(new Set(data.phase_performance.map(d => d['Cable name']))) as string[] : [],
-    [data]
-  )
-  const allPhases = useMemo(
-    () => data ? Array.from(new Set(data.phase_performance.map(d => d['phase']))).sort() as string[] : [],
     [data]
   )
 
@@ -607,7 +599,6 @@ export default function Dashboard() {
         </Flex>
 
         <Box display={activeTab === 'dashboard' ? 'block' : 'none'}>
-          <h1>VERSION TEST 123</h1>
           {/* Upload */}
           <Box {...getRootProps()} bg={cardBg} p="8" borderRadius="xl"
             boxShadow="0px 3.5px 5.5px rgba(0,0,0,0.05)"
@@ -706,7 +697,7 @@ export default function Dashboard() {
                           <XAxis dataKey="phase" axisLine={false} tickLine={false} tick={{ fill: tickFill, fontSize: 11 }} />
                           <YAxis axisLine={false} tickLine={false} tick={{ fill: tickFill, fontSize: 11 }} />
                           <Tooltip cursor={{ fill: 'rgba(79,209,197,0.08)' }} contentStyle={tooltipStyle} />
-                            <Bar dataKey="Performance (%)" fill={`url(#bg${idx})`} radius={[5, 5, 0, 0]} barSize={30} label={{ position: 'top', fontSize: 10, fill: isDark ? '#fff' : '#2D3748', formatter: (value) => Math.round(value) }} />
+                            <Bar dataKey="Performance (%)" fill={`url(#bg${idx})`} radius={[5, 5, 0, 0]} barSize={30} label={{ position: 'top', fontSize: 10, fill: isDark ? '#fff' : '#2D3748', formatter: (value: any) => typeof value === 'number' ? Math.round(value) : value }} />
                         </BarChart>
                       </ResponsiveContainer>
                     </Box>
